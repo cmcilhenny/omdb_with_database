@@ -10,11 +10,30 @@ configure do
 end
 
 get '/' do
-  #Add code here
+ 
+  erb :index
 end
 
+get '/results' do
+  c = PGconn.new(:host => "localhost", :dbname => dbname)
+  @movies = c.exec_params("SELECT * FROM movies WHERE title = $1;", [params[:title]])
+  c.close
 
-#Add code here
+  erb :results
+end
+
+get '/movie/:id' do
+  c = PGconn.new(:host => "localhost", :dbname => dbname)
+
+  @movie = c.exec_params("SELECT * FROM movies WHERE id = $1;", [params[:id]])
+ 
+
+  @actors = c.exec_params("SELECT * FROM actors INNER JOIN movies_actors ON movies_actors.actor_id = actors.id WHERE movies_actors.movie_id = $1;", [params[:id]])
+   
+   c.close
+
+  erb :movie_info
+end
 
 
 get '/movies/new' do
@@ -22,6 +41,7 @@ get '/movies/new' do
 end
 
 post '/movies' do
+  #use this line everytime you call on your postgres data base probably with a where statement
   c = PGconn.new(:host => "localhost", :dbname => dbname)
   c.exec_params("INSERT INTO movies (title, year) VALUES ($1, $2)",
                   [params["title"], params["year"]])
@@ -30,7 +50,7 @@ post '/movies' do
 end
 
 def dbname
-  "test.db"
+  "testdb"
 end
 
 def create_movies_table

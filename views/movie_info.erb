@@ -1,0 +1,9 @@
+
+<% @movie.each do |info| %>
+<h2><%= info["title"] %>, <%= info["year"] %> <br><%= info["plot"] %></br></h2>
+<% end %>
+
+<h3>Actors include:</h3>
+<h3><% @actors.each do |fullname| %>
+<%= fullname["full_name"] %> 
+<% end %></h3>
